@@ -18,6 +18,9 @@
     <ClCompile Include="Gnuplot.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="example_main.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gnuplot.h">
