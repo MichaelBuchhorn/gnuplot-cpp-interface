@@ -12,8 +12,6 @@ Gnuplot::Gnuplot(void) {
 	STARTUPINFO startupinfo;
 	GetStartupInfo(&startupinfo);
 	startupinfo.hStdInput = stdinReadPipe;
-	//startupinfo.hStdOutput = stdoutWritePipe;
-	//startupinfo.hStdError = stderrWritePipe;
 	startupinfo.hStdOutput = stdout;
 	startupinfo.hStdError = stdout;
 	startupinfo.dwFlags = STARTF_USESTDHANDLES;
@@ -24,6 +22,10 @@ Gnuplot::Gnuplot(void) {
 			throw std::runtime_error("Couldn't find the gnuplot executable.");
 		}
 	}
+
+	/* Generate a file-pointer from the input handle in order to send formated strings to gnuplot */
+	int nHandle = _open_osfhandle((long)stdinWritePipe, _O_TEXT);
+	gnuplotInput = _fdopen(nHandle, "wb");
 }
 
 
@@ -34,14 +36,19 @@ Gnuplot::~Gnuplot(void) {
 	WaitForSingleObject(processInformation.hProcess, timeout_ms);
 
 	CloseHandle(processInformation.hThread);
-	CloseHandle(stdinReadPipe);
+	fclose(gnuplotInput);
 	CloseHandle(stdoutWritePipe);
 	CloseHandle(stderrWritePipe);
 	CloseHandle(processInformation.hProcess);
 }
 
 
-void Gnuplot::sendInstruction(char* instruction) {
-	DWORD bytesWritten;
-	WriteFile(stdinWritePipe, instruction, (DWORD)strlen(instruction), &bytesWritten, NULL);
+void Gnuplot::sendInstruction(char* instruction, ...) {
+	va_list arguments;
+	va_start(arguments, instruction);
+
+	vfprintf(gnuplotInput, instruction, arguments);
+	fflush(gnuplotInput);
+
+	va_end(arguments);
 }
