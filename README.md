@@ -28,7 +28,7 @@ gp.command("a = %f; b = %f", u, v);
 gp.command("f(x) = a*x+b");
 gp.command("plot f(x)");
 ```
-It is also possible to have multiple instances of the glass running at the same time.
+It is also possible to have multiple instances of the class running at the same time.
 ```cpp
 Gnuplot gp1;
 Gnuplot gp2;
